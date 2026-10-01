@@ -2,7 +2,9 @@
 
 ## Membres
 
-- 
+- Romain LEFEBVRE — IHM (interface JavaFX, contrôleur)
+- Mylan GEORGE — Modèle (DataPoint, Dataset, patron Observateur, I/O)
+- Enzo POUGHEON — Stratégie (interface Classifier et algorithmes de classification)
 
 ## Evaluation UE1
 
