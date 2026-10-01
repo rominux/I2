@@ -1,4 +1,8 @@
 package fr.univlille.iut.sae.view;
 
-public class ScatterPlotView {
+import fr.univlille.iut.sae.model.ModelListener;
+
+public class ScatterPlotView implements ModelListener {
+    private int axisX;
+    private int axisY;
 }
