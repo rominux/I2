@@ -6,6 +6,7 @@ import java.util.List;
 public class Dataset {
     private String name;
     private List<String> columnNames;
+
     private List<ModelListener> listener;
     private List<DataPoint> dataPoints;
 
@@ -32,4 +33,5 @@ public class Dataset {
             l.onDataUpdated();
         }
     }
+
 }
