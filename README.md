@@ -6,7 +6,7 @@
 
 ### Membres de l'équipe et rôles
 * **Romain LEFEBVRE** : Développement de l'IHM JavaFX
-* **Enzo POUGHEON** :
+* **Enzo POUGHEON** : 
 * **Titouan RASSET** :
 * **Mylan GEORGE** :
 
