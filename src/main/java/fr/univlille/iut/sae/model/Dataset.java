@@ -6,7 +6,7 @@ import java.util.List;
 public class Dataset {
     private String name;
     private List<String> columnNames;
-
+    public String[] categorie = new String[2]; // nouveaux ajouter pour randomClassifier
     private List<ModelListener> listener;
     private List<DataPoint> dataPoints;
 

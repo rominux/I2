@@ -22,9 +22,9 @@ public class RandomClassifier implements Classifier{
 
     @Override
     public String classify(List<DataPoint> datapoint) {
-        for(int i = 0; i < dataset.dataPoint.size(); i++){
-            if(!dataset.dataPoint.get(i).isClassified()){
-                this.dataset.dataPoint.get(i).setCategory(randomType());
+        for(int i = 0; i < datapoint.size(); i++){
+            if(!datapoint.get(i).isClassified()){
+                datapoint.get(i).setCategory(randomType());
             }
         }
 
