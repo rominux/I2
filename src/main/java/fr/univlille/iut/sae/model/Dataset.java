@@ -43,4 +43,12 @@ public class Dataset {
         }
     }
 
+    public List<String> getColumnNames() {
+        return this.columnNames;
+    }
+
+    public void addListener(ModelListener l) {
+        this.listener.add(l);
+    }
+
 }
