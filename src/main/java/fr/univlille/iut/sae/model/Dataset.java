@@ -6,14 +6,23 @@ import java.util.List;
 public class Dataset {
     private String name;
     private List<String> columnNames;
-    public String[] categorie = new String[2]; // nouveaux ajouter pour randomClassifier
+    public String[] categorie;
     private List<ModelListener> listener;
     private List<DataPoint> dataPoints;
 
-    public Dataset(List<String> a){
-        this.columnNames=a;
+    public Dataset(List<String> columnNames,String[] categorie,List<DataPoint> dataPoints){
+        this.columnNames=columnNames;
+        this.categorie = categorie;
+        this.dataPoints=dataPoints;
         this.listener=new ArrayList<>();
-        this.dataPoints=new ArrayList<>();
+    }
+
+    public List<DataPoint> getDataPoints(){
+        return this.dataPoints;
+    }
+
+    public String[] getCategorie(){
+        return this.categorie;
     }
 
     public int getIndexOfAttribute(String attribute) {
