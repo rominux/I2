@@ -14,7 +14,7 @@ public class DataPoint {
     }
 
     public DataPoint(double[] values){
-        this(values,null,false,false);
+        this(values,"Inconnue",false,false);
     }
 
     public String getCategory() {
