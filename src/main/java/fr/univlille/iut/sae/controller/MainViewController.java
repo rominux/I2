@@ -7,12 +7,14 @@ import fr.univlille.iut.sae.model.classification.Classifier;
 import fr.univlille.iut.sae.model.classification.RandomClassifier;
 import fr.univlille.iut.sae.view.ScatterChartView;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
@@ -87,7 +89,111 @@ public class MainViewController {
     }
 
     public void addPoint() {
-        // Ouvrira une boîte de dialogue pour saisir les coordonnées
+        if (currentDataset == null || currentDataset.getColumnNames().isEmpty()) {
+            return;
+        }
+
+        //boîte de dialogue
+        Dialog<double[]> dialog = new Dialog<>();
+        dialog.setTitle("Ajouter un point");
+        dialog.setHeaderText("Saisissez les valeurs pour le nouveau point (Inconnu)");
+
+        //boutons de la boîte
+        ButtonType validerButtonType = new ButtonType("Valider", ButtonBar.ButtonData.OK_DONE);
+        dialog.getDialogPane().getButtonTypes().addAll(validerButtonType, ButtonType.CANCEL);
+
+        //bouton de validation est désactivé par défaut
+        javafx.scene.Node validerButton = dialog.getDialogPane().lookupButton(validerButtonType);
+        validerButton.setDisable(true);
+
+        //conteneur principal option
+        VBox conteneurPrincipal = new VBox(15);
+        conteneurPrincipal.setPadding(new Insets(20, 20, 20, 20));
+
+        //liste pour stocker tous les champs de texte
+        java.util.List<TextField> champsSaisie = new java.util.ArrayList<>();
+
+        //création d'une VBox pour chaque attribut
+        for (String nomColonne : currentDataset.getColumnNames()) {
+            VBox blocSaisie = new VBox(5); // Espacement de 5 entre les éléments
+            blocSaisie.setAlignment(Pos.CENTER_LEFT);
+
+            Label labelTitre = new Label(nomColonne + " :");
+            TextField champTexte = new TextField();
+            champTexte.setPromptText("Ex: 4.5");
+
+            Label labelErreur = new Label();
+            labelErreur.setTextFill(Color.RED);
+            labelErreur.setStyle("-fx-font-size: 10px;");
+
+            champsSaisie.add(champTexte);
+
+            //listener pour valider la saisie
+            champTexte.textProperty().addListener((observable, oldValue, newValue) -> {
+                boolean isValid = true;
+                if (newValue.trim().isEmpty()) {
+                    labelErreur.setText("Ce champ ne peut pas être vide.");
+                    isValid = false;
+                } else {
+                    try {
+                        Double.parseDouble(newValue.trim());
+                        labelErreur.setText(""); //efface l'erreur si c'est un nombre valide
+                    } catch (NumberFormatException e) {
+                        labelErreur.setText("Veuillez entrer un nombre valide (ex: 4.5).");
+                        isValid = false;
+                    }
+                }
+
+                //si la saisie actuelle est invalide on désactive le bouton globalement
+                if (!isValid) {
+                    validerButton.setDisable(true);
+                } else {
+                    //on vérifie si tous les autres champs sont valides
+                    validerButton.setDisable(!tousLesChampsSontValides(champsSaisie));
+                }
+            });
+
+            blocSaisie.getChildren().addAll(labelTitre, champTexte, labelErreur);
+            conteneurPrincipal.getChildren().add(blocSaisie);
+        }
+
+        //fenêtre scrollable si le jeu de données a beaucoup de colonnes
+        ScrollPane scrollPane = new ScrollPane(conteneurPrincipal);
+        scrollPane.setFitToWidth(true);
+        scrollPane.setPrefViewportHeight(400);
+
+        dialog.getDialogPane().setContent(scrollPane);
+
+        //récupération des données lors du clic
+        dialog.setResultConverter(dialogButton -> {
+            if (dialogButton == validerButtonType) {
+                double[] valeurs = new double[champsSaisie.size()];
+                for (int i = 0; i < champsSaisie.size(); i++) {
+                    valeurs[i] = Double.parseDouble(champsSaisie.get(i).getText().trim());
+                }
+                return valeurs;
+            }
+            return null;
+        });
+
+        //affichage de la boîte et ajout du point si validé
+        dialog.showAndWait().ifPresent(valeursSaisies -> {
+            addPoint(valeursSaisies); //crée le DataPoint
+        });
+    }
+
+    //vérifie l'état global du formulaire
+    private boolean tousLesChampsSontValides(java.util.List<TextField> champs) {
+        for (TextField champ : champs) {
+            String texte = champ.getText().trim();
+            if (texte.isEmpty()) return false;
+            try {
+                Double.parseDouble(texte);
+            } catch (NumberFormatException e) {
+                return false;
+            }
+        }
+        return true;
     }
 
     public void addPoint(double[] valeurs) {
@@ -115,7 +221,8 @@ public class MainViewController {
         //boîte de dialogue
         Dialog<int[]> dialog = new Dialog<>();
         dialog.setTitle("Choix des axes");
-        dialog.setHeaderText("Sélectionnez les attributs à projeter :");
+        dialog.setHeaderText("S" +
+                "électionnez les attributs à projeter :");
 
         //boutons OK et Annuler
         ButtonType okButtonType = new ButtonType("Ajouter", ButtonBar.ButtonData.OK_DONE);

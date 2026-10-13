@@ -58,47 +58,54 @@ public class ScatterChartView extends VBox implements ModelListener {
         scatterChart.getData().clear();
         seriesParCategorie.clear();
 
-        //prépare toutes les séries
-        for (String categorie : dataset.getCategorie()) {
-            creerSerie(categorie);
-        }
-        creerSerie("Inconnue");
-
-        //remplit les séries
+        // On boucle simplement sur les points existants pour les ajouter.
+        // Les séries se créeront à la volée uniquement si elles contiennent des données.
         for (DataPoint dp : dataset.getDataPoints()) {
             ajouterPointALaSerie(dp);
-        }
-
-        //ajoute les séries au graphique
-        for (XYChart.Series<Number, Number> serie : seriesParCategorie.values()) {
-            scatterChart.getData().add(serie);
-        }
-    }
-
-    private void creerSerie(String categorie) {
-        if (!seriesParCategorie.containsKey(categorie)) {
-            XYChart.Series<Number, Number> serie = new XYChart.Series<>();
-            serie.setName(categorie);
-            seriesParCategorie.put(categorie, serie);
         }
     }
 
     private void ajouterPointALaSerie(DataPoint dp) {
         String categorie = dp.getCategory();
-        creerSerie(categorie);
 
-        XYChart.Series<Number, Number> serie = seriesParCategorie.get(categorie);
+        //si premier point "Inconnue"
+        if (!seriesParCategorie.containsKey(categorie)) {
+            XYChart.Series<Number, Number> nouvelleSerie = new XYChart.Series<>();
+            nouvelleSerie.setName(categorie);
+            seriesParCategorie.put(categorie, nouvelleSerie);
 
+
+            XYChart.Data<Number, Number> dataNode = creerDataNode(dp);
+
+            //ajoute point dans la série
+            nouvelleSerie.getData().add(dataNode);
+
+            //puis ajoute la série au graphique.
+            scatterChart.getData().add(nouvelleSerie);
+        }
+        //si catégorie existe déjà, on y ajoute le point
+        else {
+            XYChart.Series<Number, Number> serieExistante = seriesParCategorie.get(categorie);
+            XYChart.Data<Number, Number> dataNode = creerDataNode(dp);
+            serieExistante.getData().add(dataNode);
+        }
+    }
+
+    private XYChart.Data<Number, Number> creerDataNode(DataPoint dp) {
         XYChart.Data<Number, Number> dataNode = new XYChart.Data<>(
                 dp.getValues(axisXIndex),
                 dp.getValues(axisYIndex)
         );
 
+        //visuel pour les points ajoutés manuellement
         if (!dp.getIsInitialData()) {
-            // TODO: ajouter différence visuelle pour les points ajoutés manuellement
+            dataNode.nodeProperty().addListener((observable, oldNode, newNode) -> {
+                if (newNode != null) {
+                    newNode.setStyle("-fx-effect: dropshadow(three-pass-box, black, 2, 1.0, 0, 0);");
+                }
+            });
         }
-
-        serie.getData().add(dataNode);
+        return dataNode;
     }
 
     @Override
@@ -110,4 +117,5 @@ public class ScatterChartView extends VBox implements ModelListener {
     public void onPointAdded(DataPoint d) {
         ajouterPointALaSerie(d);
     }
+
 }
