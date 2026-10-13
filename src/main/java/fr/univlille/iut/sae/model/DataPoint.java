@@ -25,6 +25,10 @@ public class DataPoint {
         return this.isClassified;
     };
 
+    public void setClassified(boolean isClassified) {
+        this.isClassified = isClassified;
+    }
+
     public void setCategory(String category) {
         this.category = category;
     };

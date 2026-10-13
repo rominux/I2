@@ -51,4 +51,9 @@ public class Dataset {
         this.listener.add(l);
     }
 
+    public void update(){
+        for (ModelListener l : listener) {
+            l.onDataUpdated();
+        }
+    }
 }

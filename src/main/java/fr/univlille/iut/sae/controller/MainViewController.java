@@ -86,6 +86,7 @@ public class MainViewController {
         this.currentDataset = CSVLoader.loadCSV(path);
         this.milieu.getChildren().clear();
         openNewScatterPlotView();
+        this.classifier.setTrainingSet(currentDataset);
     }
 
     public void addPoint() {
@@ -203,9 +204,11 @@ public class MainViewController {
     public void classifyUnknownPoints() {
         for (DataPoint dp : currentDataset.getDataPoints()) {
             if (!dp.getIsClassified()){
-                classifier.classify(dp);
+                dp.setCategory(this.classifier.classify(dp));
+                dp.setClassified(true);
             }
         }
+        currentDataset.update();
     }
 
     public void openNewScatterPlotView() {

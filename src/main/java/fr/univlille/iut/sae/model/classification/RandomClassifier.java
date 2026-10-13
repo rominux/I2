@@ -16,7 +16,7 @@ public class RandomClassifier implements Classifier {
     }
 
     public void setTrainingSet(Dataset dataset) {
-        this.trainingSet = dataset.getDataPoints();
+        this.trainingSet = List.copyOf(dataset.getDataPoints());
         this.categories = dataset.getCategorie();
     }
 
