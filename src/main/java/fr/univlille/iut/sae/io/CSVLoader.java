@@ -27,21 +27,32 @@ public class CSVLoader {
 
                 while ((ligne = br.readLine()) != null) {
                     String[] valeurs = ligne.split(",");
-                    double[] attributs = new double[valeurs.length-1];
-
-                    for (int i = 0; i < headers.length - 1; i++) {
-                        attributs[i] = Double.parseDouble(valeurs[i].trim());
+                    if (valeurs.length != headers.length) {
+                        continue; //on ignore les lignes mal formatées
                     }
 
-                    String categorie = valeurs[valeurs.length - 1].trim();
-                    categories.add(categorie);
+                    try {
+                        double[] attributs = new double[valeurs.length-1];
 
-                    dataPoints.add(new DataPoint(attributs, categorie, true,true));
+                        for (int i = 0; i < valeurs.length - 1; i++) {
+                            attributs[i] = Double.parseDouble(valeurs[i].trim());
+                        }
+
+                        String categorie = valeurs[valeurs.length - 1].trim();
+                        categories.add(categorie);
+
+                        dataPoints.add(new DataPoint(attributs, categorie, true, true));
+
+                    } catch (NumberFormatException e) {
+                        //si une valeur n'est pas un nombre, on ignore juste la ligne
+                        continue;
+                    }
                 }
             }
 
-        } catch (IOException | NumberFormatException e) {
-            e.printStackTrace();
+        } catch (IOException e) {
+            //les vraies erreurs de lecture du fichier tombent ici. Le dataset retourné sera vide.
+            System.err.println("Erreur de lecture du fichier : " + e.getMessage());
         }
 
         return new Dataset(NomColomne, categories.toArray(new String[0]), dataPoints);

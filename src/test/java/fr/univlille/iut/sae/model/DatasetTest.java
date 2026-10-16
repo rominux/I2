@@ -1,3 +1,4 @@
+package fr.univlille.iut.sae.model;
 
 import static org.junit.jupiter.api.Assertions.*;
 

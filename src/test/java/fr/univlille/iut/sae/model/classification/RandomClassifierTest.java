@@ -1,4 +1,4 @@
-
+package fr.univlille.iut.sae.model.classification;
 
 import static org.junit.jupiter.api.Assertions.*;
 

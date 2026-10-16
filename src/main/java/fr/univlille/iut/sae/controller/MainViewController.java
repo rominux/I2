@@ -83,7 +83,17 @@ public class MainViewController {
     }
 
     public void loadFile(String path) {
-        this.currentDataset = CSVLoader.loadCSV(path);
+        Dataset nouveauDataset = CSVLoader.loadCSV(path);
+        if (nouveauDataset.getColumnNames().isEmpty() || nouveauDataset.getDataPoints().isEmpty()) {
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Erreur de chargement");
+            alert.setHeaderText("Fichier non valide");
+            alert.setContentText("Le fichier sélectionné est vide, corrompu, ou n'est pas un fichier CSV valide compatible avec l'application.");
+            alert.showAndWait();
+            return;
+        }
+
+        this.currentDataset = nouveauDataset;
         this.milieu.getChildren().clear();
         openNewScatterPlotView();
         this.classifier.setTrainingSet(currentDataset);
