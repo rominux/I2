@@ -11,6 +11,11 @@ import javafx.scene.layout.VBox;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+/**
+ * Composant graphique représentant un nuage de points (ScatterChart).
+ * Cette vue est un observateur (ModelListener) du Dataset : elle se met à jour
+ * automatiquement lorsque les données du modèle évoluent.
+ */
 public class ScatterChartView extends VBox implements ModelListener {
 
     private final Dataset dataset;
@@ -22,6 +27,13 @@ public class ScatterChartView extends VBox implements ModelListener {
     // Utilisation de LinkedHashMap pour conserver l'ordre et avoir des couleurs constantes
     private final Map<String, XYChart.Series<Number, Number>> seriesParCategorie;
 
+    /**
+     * Construit une nouvelle vue de nuage de points et s'abonne au Dataset.
+     *
+     * @param dataset le modèle de données contenant les points à afficher.
+     * @param axisXIndex l'index de la colonne utilisée pour les abscisses.
+     * @param axisYIndex l'index de la colonne utilisée pour les ordonnées.
+     */
     public ScatterChartView(Dataset dataset, int axisXIndex, int axisYIndex) {
         this.dataset = dataset;
         this.axisXIndex = axisXIndex;
@@ -33,6 +45,10 @@ public class ScatterChartView extends VBox implements ModelListener {
         construireGraphique();
     }
 
+    /**
+     * Efface et recrée intégralement l'affichage du graphique en créant
+     * les séries de données à la volée en fonction des points présents dans le modèle.
+     */
     private void construireGraphique() {
         String labelX = dataset.getColumnNames().get(axisXIndex);
         String labelY = dataset.getColumnNames().get(axisYIndex);
@@ -54,6 +70,10 @@ public class ScatterChartView extends VBox implements ModelListener {
         this.getChildren().add(scatterChart);
     }
 
+    /**
+     * Efface et recrée intégralement l'affichage du graphique en créant
+     * les séries de données à la volée en fonction des points présents dans le modèle.
+     */
     public void mettreAJourAffichage() {
         scatterChart.getData().clear();
         seriesParCategorie.clear();
@@ -65,6 +85,13 @@ public class ScatterChartView extends VBox implements ModelListener {
         }
     }
 
+    /**
+     * Ajoute un point spécifique à la série correspondante dans le graphique.
+     * Si la catégorie du point n'existe pas encore (ex: premier point "Inconnue"),
+     * une nouvelle série est créée et ajoutée au graphique.
+     *
+     * @param dp Le DataPoint à ajouter au graphique.
+     */
     private void ajouterPointALaSerie(DataPoint dp) {
         String categorie = dp.getCategory();
 
@@ -91,6 +118,13 @@ public class ScatterChartView extends VBox implements ModelListener {
         }
     }
 
+    /**
+     * Crée le nœud graphique (Data) associé à un point pour son affichage dans le ScatterChart.
+     * Applique également un style visuel spécifique (ombre portée) si le point a été ajouté manuellement.
+     *
+     * @param dp Le DataPoint à partir duquel créer le nœud graphique.
+     * @return L'objet XYChart.Data prêt à être ajouté à une série.
+     */
     private XYChart.Data<Number, Number> creerDataNode(DataPoint dp) {
         XYChart.Data<Number, Number> dataNode = new XYChart.Data<>(
                 dp.getValues(axisXIndex),
@@ -108,11 +142,20 @@ public class ScatterChartView extends VBox implements ModelListener {
         return dataNode;
     }
 
+    /**
+     * Déclenchée par le modèle (Dataset) lors d'une mise à jour globale
+     */
     @Override
     public void onDataUpdated() {
         mettreAJourAffichage();
     }
 
+    /**
+     * Déclenchée par le modèle (Dataset) lors de l'ajout d'un unique point.
+     * Permet d'optimiser l'affichage en ajoutant le point directement sans tout redessiner.
+     *
+     * @param d le nouveau point de données ajouté au modèle.
+     */
     @Override
     public void onPointAdded(DataPoint d) {
         ajouterPointALaSerie(d);

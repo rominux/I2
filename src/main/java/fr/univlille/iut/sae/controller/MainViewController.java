@@ -20,12 +20,22 @@ import javafx.stage.Stage;
 
 import java.io.File;
 
+/**
+ * Contrôleur principal de l'application (Patron MVC).
+ * Gère les interactions utilisateur, le chargement des fichiers CSV,
+ * la création des vues graphiques et l'application du classifieur.
+ */
 public class MainViewController {
     private final Stage stage;
     private Dataset currentDataset;
     private Classifier classifier;
     private final FlowPane milieu;
 
+    /**
+     * Construit le contrôleur et initialise l'interface graphique complète.
+     *
+     * @param stage la fenêtre principale dans laquelle afficher l'application.
+     */
     public MainViewController(Stage stage) {
         this.stage = stage;
         this.classifier = new RandomClassifier(); //jalon 1
@@ -49,8 +59,6 @@ public class MainViewController {
         });
         haut.getChildren().addAll(chargerCSV, nomCSV);
 
-
-
         this.milieu = new FlowPane();
         this.milieu.setVgap(10);
         this.milieu.setHgap(10);
@@ -59,7 +67,6 @@ public class MainViewController {
         scrollPane.setContent(this.milieu);
         scrollPane.setFitToWidth(true);
 
-        //priorité au ScrollPane pour qu'il prenne tout l'espace central disponible
         VBox.setVgrow(scrollPane, javafx.scene.layout.Priority.ALWAYS);
 
         HBox bas = new HBox(10);
@@ -82,6 +89,12 @@ public class MainViewController {
         this.stage.show();
     }
 
+    /**
+     * Charge un jeu de données à partir d'un fichier CSV.
+     * En cas d'erreur de lecture ou de fichier invalide, une alerte est affichée.
+     *
+     * @param path le chemin absolu vers le fichier CSV à charger.
+     */
     public void loadFile(String path) {
         Dataset nouveauDataset = CSVLoader.loadCSV(path);
         if (nouveauDataset.getColumnNames().isEmpty() || nouveauDataset.getDataPoints().isEmpty()) {
@@ -99,6 +112,11 @@ public class MainViewController {
         this.classifier.setTrainingSet(currentDataset);
     }
 
+    /**
+     * Ouvre une boîte de dialogue dynamique permettant à l'utilisateur
+     * de saisir manuellement les attributs d'un nouveau point de données.
+     * Gère la validation des saisies en temps réel.
+     */
     public void addPoint() {
         if (currentDataset == null || currentDataset.getColumnNames().isEmpty()) {
             return;
@@ -207,10 +225,20 @@ public class MainViewController {
         return true;
     }
 
+    /**
+     * Ajoute un point au modèle de données actif (Dataset).
+     *
+     * @param valeurs le tableau des valeurs numériques caractérisant le point.
+     */
     public void addPoint(double[] valeurs) {
         this.currentDataset.addDataPoint(new DataPoint(valeurs));
     }
 
+    /**
+     * Parcours l'ensemble des points du Dataset et applique le classifieur
+     * configuré (ex: RandomClassifier) sur les points non encore classifiés.
+     * Notifie ensuite les vues de la mise à jour.
+     */
     public void classifyUnknownPoints() {
         for (DataPoint dp : currentDataset.getDataPoints()) {
             if (!dp.getIsClassified()){
@@ -221,6 +249,11 @@ public class MainViewController {
         currentDataset.update();
     }
 
+    /**
+     * Affiche une boîte de dialogue permettant à l'utilisateur de choisir
+     * deux axes (X et Y) parmi les attributs du modèle, puis ouvre une
+     * nouvelle vue graphique (ScatterChartView) basée sur ces axes.
+     */
     public void openNewScatterPlotView() {
         if (currentDataset == null) {
             return;
@@ -281,6 +314,12 @@ public class MainViewController {
         });
     }
 
+    /**
+     * Crée et ajoute une nouvelle vue graphique (ScatterChart) à l'interface.
+     *
+     * @param axisXindex l'index de l'attribut à projeter sur l'axe X.
+     * @param axisYindex l'index de l'attribut à projeter sur l'axe Y.
+     */
     public void openNewScatterPlotView(int axisXindex,int axisYindex) {
         if (currentDataset == null) {
             return;
