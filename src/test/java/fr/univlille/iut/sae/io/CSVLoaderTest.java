@@ -11,7 +11,7 @@ public class CSVLoaderTest {
     @Test
     public void testLoadCSV() throws Exception {
 
-        String path = "res/test.csv";
+        String path = "src/test/resources/test.csv";
 
         Dataset dataset = CSVLoader.loadCSV(path);
 
